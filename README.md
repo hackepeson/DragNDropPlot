@@ -1,0 +1,4 @@
+QT
+==
+
+QT applications
