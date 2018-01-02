@@ -25,6 +25,10 @@ protected:
 
 private:
     Ui::MainWindow *ui;
+    QString m_currentFile;
+
+private slots:
+    void updatePlotFromCurrentFile();
 };
 
 #endif // MAINWINDOW_H

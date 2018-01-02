@@ -8,6 +8,8 @@ MainWindow::MainWindow(QWidget *parent) :
 {
     ui->setupUi(this);
     setAcceptDrops(true);
+
+    connect(ui->pushButtonUpdateFromCurrentFile, SIGNAL(released()), SLOT(updatePlotFromCurrentFile()));
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent *e)
@@ -29,6 +31,7 @@ void MainWindow::dropEvent(QDropEvent *e)
     }
     */
     qDebug() << e->mimeData()->urls().at(0).toLocalFile();
+    m_currentFile = e->mimeData()->urls().at(0).toLocalFile();
     ui->widgetPlot->clearGraphs();
     ui->widgetPlot->addGraph();
 
@@ -50,6 +53,7 @@ void MainWindow::dropEvent(QDropEvent *e)
         ui->widgetPlot->graph(0)->addData(timeVec, dataVec);
         ui->widgetPlot->rescaleAxes();
         ui->widgetPlot->replot();
+        inFile.close();
 
     }
     else
@@ -61,4 +65,38 @@ void MainWindow::dropEvent(QDropEvent *e)
 MainWindow::~MainWindow()
 {
     delete ui;
+}
+
+void MainWindow::updatePlotFromCurrentFile()
+{
+    ui->widgetPlot->clearGraphs();
+    ui->widgetPlot->addGraph();
+
+    QFile inFile(m_currentFile);
+    if (inFile.open(QIODevice::ReadOnly))
+    {
+
+        QString data = inFile.readAll();
+        QStringList qsl = data.split("\n");
+
+        QVector<double> dataVec;
+        QVector<double> timeVec;
+
+        for (int i = 0; i < qsl.count(); i++)
+        {
+            dataVec.append(qsl.at(i).toDouble());
+            timeVec.append(i);
+        }
+        ui->widgetPlot->graph(0)->addData(timeVec, dataVec);
+        ui->widgetPlot->rescaleAxes();
+        ui->widgetPlot->replot();
+        inFile.close();
+
+    }
+    else
+    {
+        qDebug() << "Failed to open file";
+    }
+
+
 }
