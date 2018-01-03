@@ -9,6 +9,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     setAcceptDrops(true);
 
+    // QCustomPlot
+     ui->widgetPlot->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectAxes |
+                                        QCP::iSelectLegend | QCP::iSelectPlottables);
+
+
+
     connect(ui->pushButtonUpdateFromCurrentFile, SIGNAL(released()), SLOT(updatePlotFromCurrentFile()));
 }
 
@@ -98,5 +104,49 @@ void MainWindow::updatePlotFromCurrentFile()
         qDebug() << "Failed to open file";
     }
 
+
+}
+
+void MainWindow::mousePress(QMouseEvent* mevent)
+{
+    // if an axis is selected, only allow the direction of that axis to be dragged
+    // if no axis is selected, both directions may be dragged
+
+    if ( ui->widgetPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+         ui->widgetPlot->axisRect()->setRangeDrag(ui->widgetPlot->xAxis->orientation());
+    else if ( ui->widgetPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+         ui->widgetPlot->axisRect()->setRangeDrag(ui->widgetPlot->yAxis->orientation());
+    else
+         ui->widgetPlot->axisRect()->setRangeDrag(Qt::Horizontal|Qt::Vertical);
+
+}
+
+void MainWindow::mouseWheel(QWheelEvent* mevent)
+{
+    if (ui->widgetPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        ui->widgetPlot->axisRect()->setRangeZoom(ui->widgetPlot->xAxis->orientation());
+    else if (ui->widgetPlot->yAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        ui->widgetPlot->axisRect()->setRangeZoom(ui->widgetPlot->yAxis->orientation());
+    else
+        ui->widgetPlot->axisRect()->setRangeZoom(Qt::Horizontal|Qt::Vertical);
+}
+
+void MainWindow::mouseRelease(QMouseEvent *mevent)
+{
+
+    if (ui->widgetPlot->xAxis->selectedParts().testFlag(QCPAxis::spAxis))
+        ui->widgetPlot->axisRect()->setRangeDrag(ui->widgetPlot->xAxis->orientation());
+    else
+        ui->widgetPlot->axisRect()->setRangeDrag(Qt::Horizontal|Qt::Vertical);
+
+    double xMin = ui->widgetPlot->xAxis->range().center() - ui->widgetPlot->xAxis->range().size()/2.0;
+    double xMax = ui->widgetPlot->xAxis->range().center() + ui->widgetPlot->xAxis->range().size()/2.0;
+
+
+
+}
+
+void MainWindow::mouseMove(QMouseEvent *mevent)
+{
 
 }

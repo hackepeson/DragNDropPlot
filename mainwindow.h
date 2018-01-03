@@ -29,6 +29,11 @@ private:
 
 private slots:
     void updatePlotFromCurrentFile();
+
+    void mousePress(QMouseEvent* mevent);
+    void mouseMove(QMouseEvent *mevent);
+    void mouseRelease(QMouseEvent *mevent);
+    void mouseWheel(QWheelEvent* mevent);
 };
 
 #endif // MAINWINDOW_H
